@@ -1,17 +1,17 @@
 import time
 import uuid
-from fastapi import APIRouter
-from fastapi import Depends
+from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from app.models.ai_request import AIRequest
 from app.services.ai.provider_factory import ProviderFactory
 from app.services.interacion_logger import InteractionLogger
+from app.api.deps import verify_student
 
 router = APIRouter()
 logger = InteractionLogger()
 
 @router.post("/generate")
-async def generate(request: AIRequest):
+async def generate(request: AIRequest, user: dict = Depends(verify_student)):
     provider = ProviderFactory.create(request.provider)
     
     result = await provider.generate(
@@ -36,7 +36,7 @@ async def generate(request: AIRequest):
     return result
 
 @router.post("/stream")
-async def stream_generate(request: AIRequest):
+async def stream_generate(request: AIRequest, user: dict = Depends(verify_student)):
     provider = ProviderFactory.create(request.provider)
     print(provider)
     word_limit = max(1, int((request.max_tokens * 0.75) - 10))
@@ -48,7 +48,6 @@ async def stream_generate(request: AIRequest):
         total_response = ""
         chunks = []
         try:
-            print(request.temperature)
             async for token in provider.stream_generate(
                 system_prompt=modified_prompt,
                 user_prompt=request.user_prompt,
@@ -64,7 +63,7 @@ async def stream_generate(request: AIRequest):
             session_id = str(uuid.uuid4())
             
             await logger.log(
-                user_id="crashtestdummy",
+                user_id=user['uid'],
                 prompt=request.user_prompt,
                 response=total_response,
                 metadata={
@@ -80,7 +79,7 @@ async def stream_generate(request: AIRequest):
         except Exception as e:
             latency = (time.time() - start) * 1000
             await logger.log(
-                user_id="crashtestdummy",
+                user_id=user["uid"],
                 prompt=request.user_prompt,
                 response=total_response,
                 metadata={
