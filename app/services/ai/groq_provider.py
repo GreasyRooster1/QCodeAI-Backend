@@ -18,6 +18,8 @@ class GroqProvider(BaseAIProvider):
             model=self.model,
             temperature=temperature,
             max_tokens=max_tokens,
+            frequency_penalty=frequency_penalty,
+            top_p=top_p,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
