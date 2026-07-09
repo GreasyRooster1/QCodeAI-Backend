@@ -18,6 +18,8 @@ async def generate(request: AIRequest, user: dict = Depends(verify_student)):
         system_prompt=request.system_prompt,
         user_prompt=request.user_prompt,
         temperature=request.temperature,
+        top_p=request.top_p,
+        frequency_penalty=request.frequency_penalty,
         max_tokens=request.max_tokens
     )
     
@@ -52,6 +54,8 @@ async def stream_generate(request: AIRequest, user: dict = Depends(verify_studen
                 system_prompt=modified_prompt,
                 user_prompt=request.user_prompt,
                 temperature=request.temperature,
+                top_p=request.top_p,
+                frequency_penalty=request.frequency_penalty,
                 max_tokens=request.max_tokens,
             ):
                 # total_response += token
