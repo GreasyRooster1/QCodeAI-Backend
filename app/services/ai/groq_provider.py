@@ -12,7 +12,7 @@ class GroqProvider(BaseAIProvider):
         self.model = model
         self.provider_name = "groq"
     
-    async def generate(self, system_prompt: str, user_prompt: str, temperature: float, max_tokens: int) -> AIResult:
+    async def generate(self, system_prompt: str, user_prompt: str, temperature: float, top_p:float, frequency_penalty:float, max_tokens: int) -> AIResult:
         start = time.time()
         response = await self.client.chat.completions.create(
             model=self.model,
@@ -35,7 +35,7 @@ class GroqProvider(BaseAIProvider):
             token_count=token_count
         )
     
-    async def stream_generate(self, system_prompt: str, user_prompt: str, temperature: float, max_tokens: int):
+    async def stream_generate(self, system_prompt: str, user_prompt: str, temperature: float, top_p:float, frequency_penalty:float, max_tokens: int):
         stream = await self.client.chat.completions.create(
             model=self.model,
             temperature=temperature,

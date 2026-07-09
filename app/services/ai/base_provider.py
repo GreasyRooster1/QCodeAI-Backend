@@ -9,7 +9,9 @@ class BaseAIProvider(ABC):
         system_prompt: str,
         user_prompt: str,
         temperature: float,
-        max_tokens: int,
+        top_p:float,
+        frequency_penalty:float,
+        max_tokens: int
     ) -> AIResult:
         pass
     
@@ -19,6 +21,8 @@ class BaseAIProvider(ABC):
         system_prompt: str,
         user_prompt: str,
         temperature: float,
+        top_p: float,
+        frequency_penalty: float,
         max_tokens: int
     ):
         pass

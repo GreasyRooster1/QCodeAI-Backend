@@ -8,7 +8,7 @@ class OllamaProvider(BaseAIProvider):
         self.model = model
         self.provider_name = "ollama"
     
-    async def generate(self, system_prompt: str, user_prompt: str, temperature: float, max_tokens: int) -> AIResult:
+    async def generate(self, system_prompt: str, user_prompt: str, temperature: float, top_p:float, frequency_penalty:float, max_tokens: int) -> AIResult:
         start = time.time()
         
         response = ollama.chat(
@@ -43,7 +43,7 @@ class OllamaProvider(BaseAIProvider):
             token_count=token_count
         )
     
-    async def stream_generate(self, system_prompt: str, user_prompt: str, temperature: float, max_tokens: int):
+    async def stream_generate(self, system_prompt: str, user_prompt: str, temperature: float, top_p:float, frequency_penalty:float, max_tokens: int):
         stream = ollama.chat(
             model=self.model,
             messages=[

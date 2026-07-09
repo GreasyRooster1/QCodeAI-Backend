@@ -2,7 +2,7 @@ from app.models.ai_result import AIResult
 from app.services.ai.base_provider import BaseAIProvider
 
 class DummyProvider(BaseAIProvider):
-    async def generate(self, system_prompt: str, user_prompt: str, temperature: float, max_tokens: int):
+    async def generate(self, system_prompt: str, user_prompt: str, temperature: float, top_p:float, frequency_penalty:float, max_tokens: int):
         return AIResult(
             output="test",
             provider="dummy",
@@ -11,7 +11,7 @@ class DummyProvider(BaseAIProvider):
             token_count=1
         )
     
-    async def stream_generate(self, system_prompt: str, user_prompt: str, temperature: float, max_tokens: int):
+    async def stream_generate(self, system_prompt: str, user_prompt: str, temperature: float, top_p:float, frequency_penalty:float, max_tokens: int):
         return AIResult(
             output="test",
             provider="dummy",
