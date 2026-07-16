@@ -10,7 +10,7 @@ class OpenRouterProvider(BaseAIProvider):
             base_url="https://openrouter.ai/api/v1"
         )
         self.model = model
-        self.provider_name = "open_router"
+        self.provider_name = "openrouter"
     
     async def generate(self, system_prompt: str, user_prompt: str, temperature: float, top_p:float, frequency_penalty:float, max_tokens: int) -> AIResult:
         start = time.time()
