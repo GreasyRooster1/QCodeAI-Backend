@@ -4,7 +4,7 @@ from app.services.ai.base_provider import BaseAIProvider
 from app.models.ai_result import AIResult
 
 class OpenRouterProvider(BaseAIProvider):
-    def __init__(self, api_key: str, model: str = "moonshotai/kimi-k2.7-code"):
+    def __init__(self, api_key: str, model: str):
         self.client = AsyncOpenAI(
             api_key=api_key,
             base_url="https://openrouter.ai/api/v1"
