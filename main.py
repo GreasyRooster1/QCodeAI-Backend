@@ -18,10 +18,10 @@ app.add_middleware(
 )
 
 app.include_router(ai.router, prefix="/api/ai", tags=["Generation"])
-app.include_router(combo_game.router, prefix="/api/combo_game", tags=['Combo Game'])
-app.include_router(prompts.router, prefix="/api/prompts", tags=["Prompt Builder"])
-app.include_router(nn.router, prefix="/api/nn", tags=["Neural Network Sim"])
-app.include_router(pet_trainer.router, prefix="/api/pet_trainer", tags=["Pet Trainer - Reinforcement Learning"])
+# app.include_router(combo_game.router, prefix="/api/combo_game", tags=['Combo Game'])
+# app.include_router(prompts.router, prefix="/api/prompts", tags=["Prompt Builder"])
+# app.include_router(nn.router, prefix="/api/nn", tags=["Neural Network Sim"])
+# app.include_router(pet_trainer.router, prefix="/api/pet_trainer", tags=["Pet Trainer - Reinforcement Learning"])
 
 @app.get("/")
 async def root():
