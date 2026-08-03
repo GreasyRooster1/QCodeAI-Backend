@@ -1,4 +1,7 @@
+import os
 import time
+
+from openrouter import OpenRouter
 from openai import AsyncOpenAI
 from app.services.ai.base_provider import BaseAIProvider
 from app.models.ai_result import AIResult
@@ -14,23 +17,22 @@ class OpenRouterProvider(BaseAIProvider):
     
     async def generate(self, system_prompt: str, user_prompt: str, temperature: float, top_p:float, frequency_penalty:float, max_tokens: int) -> AIResult:
         start = time.time()
-        response = await self.client.chat.completions.create(
-            model=self.model,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            frequency_penalty=frequency_penalty,
-            top_p=top_p,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ]
-        )
-        output = response.choices[0].message.content
+        with OpenRouter(
+                api_key=os.getenv("OPENROUTER_API_KEY", ""),
+        ) as open_router:
+            res = open_router.chat.send(
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                stream=False,
+            )
+        print(res)
         latency = (time.time() - start) * 1000
-        token_count = len(output.split())
+        token_count = len(res.split())
         
         return AIResult(
-            output=output,
+            output=res,
             provider=self.provider_name,
             model=self.model,
             latency_ms=latency,
