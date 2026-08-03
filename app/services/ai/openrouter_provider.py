@@ -32,7 +32,7 @@ class OpenRouterProvider(BaseAIProvider):
                 temperature=temperature,
                 top_p=top_p,
                 frequency_penalty=frequency_penalty,
-                reasoning_effort="low",
+                reasoning_effort="none",
             )
         print(res)
         output = res.choices[0].message.content
