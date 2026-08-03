@@ -28,12 +28,16 @@ class OpenRouterProvider(BaseAIProvider):
                 stream=False,
                 model=self.model,
                 max_tokens=max_tokens,
+                max_completion_tokens=max_tokens,
                 temperature=temperature,
                 top_p=top_p,
                 frequency_penalty=frequency_penalty,
+                reasoning_effort="low",
             )
+        print(res)
         output = res.choices[0].message.content
         latency = (time.time() - start) * 1000
+        token_count: int = 0
         if not output is None:
             token_count = len(output.split())
         
