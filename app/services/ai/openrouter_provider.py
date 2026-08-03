@@ -27,6 +27,10 @@ class OpenRouterProvider(BaseAIProvider):
                 ],
                 stream=False,
                 model=self.model,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                top_p=top_p,
+                frequency_penalty=frequency_penalty,
             )
         output = res.choices[0].message.content
         latency = (time.time() - start) * 1000
