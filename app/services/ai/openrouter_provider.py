@@ -27,7 +27,6 @@ class OpenRouterProvider(BaseAIProvider):
                 ],
                 stream=False,
                 model=self.model,
-                max_tokens=max_tokens,
                 max_completion_tokens=max_tokens,
                 temperature=temperature,
                 top_p=top_p,
