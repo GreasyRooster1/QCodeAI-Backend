@@ -28,12 +28,13 @@ class OpenRouterProvider(BaseAIProvider):
                 stream=False,
                 model=self.model,
             )
-        print(res)
+        output = res.choices[0].message.content
         latency = (time.time() - start) * 1000
-        token_count = len(res.split())
+        if not output is None:
+            token_count = len(output.split())
         
         return AIResult(
-            output=res,
+            output=output,
             provider=self.provider_name,
             model=self.model,
             latency_ms=latency,
