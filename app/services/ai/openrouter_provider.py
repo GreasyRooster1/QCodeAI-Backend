@@ -26,6 +26,7 @@ class OpenRouterProvider(BaseAIProvider):
                     {"role": "user", "content": user_prompt}
                 ],
                 stream=False,
+                model=self.model,
             )
         print(res)
         latency = (time.time() - start) * 1000
