@@ -1,3 +1,4 @@
+import json
 import time
 import uuid
 from fastapi import APIRouter, Depends
@@ -60,10 +61,9 @@ async def stream_generate(request: AIRequest, user: dict = Depends(verify_studen
             ):
                 # total_response += token
                 chunks.append(token)
-                yield token
+                yield json.dumps(token)
             
             latency = (time.time() - start) * 1000
-            token_count = len("".join(chunks).split())
             session_id = str(uuid.uuid4())
             
             await logger.log(
@@ -75,7 +75,7 @@ async def stream_generate(request: AIRequest, user: dict = Depends(verify_studen
                     "provider": request.provider,
                     "model": provider.model,
                     "latency": latency,
-                    "token_count": token_count,
+                    "token_count": 0,
                     "streaming": True,
                     "status": "success",
                 }
