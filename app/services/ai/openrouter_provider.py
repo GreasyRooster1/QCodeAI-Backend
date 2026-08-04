@@ -3,6 +3,8 @@ import time
 
 from openrouter import OpenRouter
 from openai import AsyncOpenAI
+from pygments.styles.dracula import yellow
+
 from app.services.ai.base_provider import BaseAIProvider
 from app.models.ai_result import AIResult
 
@@ -50,17 +52,32 @@ class OpenRouterProvider(BaseAIProvider):
         )
     
     async def stream_generate(self, system_prompt: str, user_prompt: str, temperature: float, top_p:float, frequency_penalty:float, max_tokens: int):
-        stream = await self.client.chat.completions.create(
-            model=self.model,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            stream=True
-        )
-        
-        async for chunk in stream:
-            if chunk.choices[0].delta.content is not None:
-                yield chunk.choices[0].delta.content
+        with OpenRouter(
+                api_key=os.getenv("OPENROUTER_API_KEY", ""),
+        ) as open_router:
+            res = await open_router.chat.send_async(
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                stream=True,
+                model=self.model,
+                max_completion_tokens=max_tokens,
+                temperature=temperature,
+                top_p=top_p,
+                frequency_penalty=frequency_penalty,
+                reasoning_effort=self.reasoning_effort,
+            )
+
+        async with res as event_stream:
+            async for chunk in event_stream:
+                if not chunk.choices:  # usage-only / keepalive chunks
+                    continue
+                reasoning = chunk.choices[0].delta.reasoning
+                content = chunk.choices[0].delta.content
+
+                if content:
+                    yield ("content",content)
+
+                if reasoning:
+                    yield ("reasonning",content)
