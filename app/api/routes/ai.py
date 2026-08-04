@@ -100,5 +100,5 @@ async def stream_generate(request: AIRequest, user: dict = Depends(verify_studen
     
     return StreamingResponse(
         token_stream(),
-        media_type="text/plain",
+        media_type="application/json",
     )
