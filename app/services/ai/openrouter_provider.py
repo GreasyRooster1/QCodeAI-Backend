@@ -77,7 +77,7 @@ class OpenRouterProvider(BaseAIProvider):
                 content = chunk.choices[0].delta.content
 
                 if content:
-                    yield ("content",content)
+                    yield {type:"content",content:content}
 
                 if reasoning:
-                    yield ("reasonning",content)
+                    yield {type:"reasoning",content:content}
