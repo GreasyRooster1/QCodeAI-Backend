@@ -7,13 +7,14 @@ from app.services.ai.base_provider import BaseAIProvider
 from app.models.ai_result import AIResult
 
 class OpenRouterProvider(BaseAIProvider):
-    def __init__(self, api_key: str, model: str):
+    def __init__(self, api_key: str, model: str, reasoning_effort: str):
         self.client = AsyncOpenAI(
             api_key=api_key,
             base_url="https://openrouter.ai/api/v1"
         )
         self.model = model
         self.provider_name = "openrouter"
+        self.reasoning_effort = reasoning_effort
     
     async def generate(self, system_prompt: str, user_prompt: str, temperature: float, top_p:float, frequency_penalty:float, max_tokens: int) -> AIResult:
         start = time.time()
@@ -31,7 +32,7 @@ class OpenRouterProvider(BaseAIProvider):
                 temperature=temperature,
                 top_p=top_p,
                 frequency_penalty=frequency_penalty,
-                reasoning_effort="none",
+                reasoning_effort=self.reasoning_effort,
             )
         print(res)
         output = res.choices[0].message.content

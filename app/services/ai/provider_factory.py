@@ -10,11 +10,11 @@ class ProviderFactory:
     @staticmethod
     def create(provider_name: str):
         if provider_name == "kimi27code":
-            return OpenRouterProvider(api_key=settings.OPENROUTER_API_KEY, model="moonshotai/kimi-k2.7-code")
+            return OpenRouterProvider(api_key=settings.OPENROUTER_API_KEY, model="moonshotai/kimi-k2.7-code", reasoning_effort="low")
         elif provider_name == "groq":
             return GroqProvider(api_key=settings.GROQ_API_KEY)
         elif provider_name == "deepseekv4flash":
-            return OpenRouterProvider(api_key=settings.OPENROUTER_API_KEY, model="deepseek/deepseek-v4-flash")
+            return OpenRouterProvider(api_key=settings.OPENROUTER_API_KEY, model="deepseek/deepseek-v4-flash", reasoning_effort="none")
         # elif provider_name == "ollama":
         #     return OllamaProvider(settings.DEFAULT_MODEL)
         # elif provider_name == "dummy":
