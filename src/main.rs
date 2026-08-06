@@ -13,6 +13,7 @@ use async_openai::{
     types::{CreateChatCompletionRequestArgs, ChatCompletionRequestUserMessageArgs},
     Client,
 };
+use dotenvy::dotenv;
 use serde_json::json;
 
 struct ServerState {
@@ -36,7 +37,7 @@ struct AIRequest {
 
 #[launch]
 async fn rocket() -> _ {
-
+    dotenv().unwrap();
     let firebase_auth = FirebaseAuth::builder()
         .json_file("service-account.json")
         .build()
@@ -98,17 +99,17 @@ async fn generate(token: FirebaseToken,req: Json<AIRequest>) -> Result<Json<AIRe
             let client = reqwest::Client::new();
 
             let response = client
-                .post("https://api.groq.com/openai/v1")
+                .post("https://api.groq.com/openai/v1/chat/completions")
                 .header("Authorization", format!("Bearer {}", api_key))
                 .json(&json!({
-                    "model": "gpt-4o",
+                    "model": "llama-3.1-8b-instant",
                     "messages": [{"role": "system", "content": req.system_prompt.clone().unwrap()},{"role": "user", "content": req.user_prompt.clone().unwrap()}],
                 }))
                 .send()
                 .await.unwrap()
                 .json::<serde_json::Value>()
                 .await.unwrap();
-            println!("{}", response["choices"][0]["message"]["content"]);
+            println!("{}", response);
             let out = response["choices"][0]["message"]["content"].as_str().unwrap().to_string();
             Ok(Json(AIResponse{
                 output:out
@@ -131,7 +132,7 @@ impl Fairing for CORS {
     }
 
     async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
-        response.set_header(Header::new("Access-Control-Allow-Origin", "http://localhost:3000"));
+        response.set_header(Header::new("Access-Control-Allow-Origin", "https://ai.esporterz.com"));
         response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, DELETE, OPTIONS"));
         response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
         response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
