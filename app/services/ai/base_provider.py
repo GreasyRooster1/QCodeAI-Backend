@@ -4,7 +4,7 @@ from app.models.ai_result import AIResult
 class BaseAIProvider(ABC):
     
     @abstractmethod
-    async def generate(
+    def generate(
         self,
         system_prompt: str,
         user_prompt: str,
@@ -16,7 +16,7 @@ class BaseAIProvider(ABC):
         pass
     
     @abstractmethod
-    async def stream_generate(
+    def stream_generate(
         self,
         system_prompt: str,
         user_prompt: str,

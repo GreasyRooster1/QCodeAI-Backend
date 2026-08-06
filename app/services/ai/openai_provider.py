@@ -6,7 +6,7 @@ class OpenAIProvider(BaseAIProvider):
         self.client = AsyncOpenAI(api_key=api_key)
     
     async def generate(self, system_prompt: str, user_prompt: str, temperature: float, top_p:float, frequency_penalty:float, max_tokens: int):
-        response = await self.client.chat.completions.create(
+        response = self.client.chat.completions.create(
             model="gpt-4.1-mini",
             temperature=temperature,
             max_tokens=max_tokens,

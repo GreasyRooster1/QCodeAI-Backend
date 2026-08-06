@@ -17,12 +17,12 @@ class OpenRouterProvider(BaseAIProvider):
         self.provider_name = "openrouter"
         self.reasoning_effort = reasoning_effort
     
-    async def generate(self, system_prompt: str, user_prompt: str, temperature: float, top_p:float, frequency_penalty:float, max_tokens: int) -> AIResult:
+    def generate(self, system_prompt: str, user_prompt: str, temperature: float, top_p:float, frequency_penalty:float, max_tokens: int) -> AIResult:
         start = time.time()
         with OpenRouter(
                 api_key=os.getenv("OPENROUTER_API_KEY", ""),
         ) as open_router:
-            res = await open_router.chat.send_async(
+            res = open_router.chat.send(
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
@@ -54,7 +54,7 @@ class OpenRouterProvider(BaseAIProvider):
         with OpenRouter(
                 api_key=os.getenv("OPENROUTER_API_KEY", ""),
         ) as open_router:
-            res = await open_router.chat.send_async(
+            res = open_router.chat.send(
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}

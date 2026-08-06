@@ -17,7 +17,7 @@ logger = InteractionLogger()
 async def generate(request: AIRequest, user: dict = Depends(verify_student)):
     provider = ProviderFactory.create(request.provider)
     async def blocking():
-        return await provider.generate(
+        return provider.generate(
         system_prompt=request.system_prompt,
         user_prompt=request.user_prompt,
         temperature=request.temperature,
