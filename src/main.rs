@@ -61,7 +61,8 @@ async fn generate(token: FirebaseToken,req: Json<AIRequest>) -> Result<Json<AIRe
     let client = OpenRouterClient::builder()
         .api_key(env::var("OPENROUTER_API_KEY").unwrap())
         .build().unwrap();
-    match req.provider.expect("no provider").as_str() {
+    let provider = req.provider.clone().unwrap();
+    match provider.as_str() {
         "kimi27code" => {
             let request = ChatCompletionBuilder::new("moonshotai/kimi-k2.7-code")
                 .user_message(req.user_prompt.clone().unwrap())
