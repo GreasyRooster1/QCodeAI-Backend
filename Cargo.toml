@@ -9,3 +9,6 @@ rocket = { version = "0.5.1",features = ["json","serde_json"] }
 serde = "1.0.229"
 openrouter-rust = "0.1.0"
 dotenvy = "0.15"
+async-openai = "0.26"
+reqwest = "0.12.28"
+serde_json = "1.0.151"

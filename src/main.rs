@@ -2,13 +2,18 @@
 
 use std::env;
 use std::sync::Arc;
-use openrouter_rust::OpenRouterClient;
+use openrouter_rust::{ChatCompletionBuilder, OpenRouterClient};
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::{Request, Response};
 use rocket::http::Header;
 use rocket::serde::json::Json;
 use rocket::serde::{Deserialize, Serialize};
 use rocket_firebase_auth::{FirebaseAuth, FirebaseToken};
+use async_openai::{
+    types::{CreateChatCompletionRequestArgs, ChatCompletionRequestUserMessageArgs},
+    Client,
+};
+use serde_json::json;
 
 struct ServerState {
     auth: FirebaseAuth,
@@ -20,13 +25,13 @@ struct AIResponse{
 }
 #[derive(Serialize,Deserialize)]
 struct AIRequest {
-    provider: String,
-    system_prompt: String,
-    user_prompt: String,
-    temperature: f32,
-    top_p: f32,
-    frequency_penalty: f32,
-    max_tokens: f32,
+    provider: Option<String>,
+    system_prompt: Option<String>,
+    user_prompt: Option<String>,
+    temperature: Option<f32>,
+    top_p: Option<f32>,
+    frequency_penalty: Option<f32>,
+    max_tokens: Option<f32>,
 }
 
 #[launch]
@@ -52,26 +57,63 @@ fn status() -> &'static str {
 }
 
 #[post("/ai/generate",format = "json", data = "<req>")]
-fn generate(token: FirebaseToken,req: Json<AIRequest>) -> Result<Json<AIResponse>, String> {
+async fn generate(token: FirebaseToken,req: Json<AIRequest>) -> Result<Json<AIResponse>, String> {
     let client = OpenRouterClient::builder()
-        .api_key(env::var("OPENROUTER_API_KEY"))
-        .build()?;
-    match req.provider.as_str() {
+        .api_key(env::var("OPENROUTER_API_KEY").unwrap())
+        .build().unwrap();
+    match req.provider.expect("no provider").as_str() {
         "kimi27code" => {
-            Ok(Json(AIResponse {
-                output: req.user_prompt.clone(),
+            let request = ChatCompletionBuilder::new("moonshotai/kimi-k2.7-code")
+                .user_message(req.user_prompt.clone().unwrap())
+                .temperature(req.temperature.unwrap_or(0.7))
+                .max_tokens(req.max_tokens.unwrap_or(200.0) as u32)
+                .top_p(req.top_p.unwrap_or(0.95))
+                //todo freq penalty
+                .system_message(req.system_prompt.clone().unwrap_or("".to_string()))
+                .build();
+            let response = client.chat_completion(request).await.unwrap();
+
+            Ok(Json(AIResponse{
+                output:response.choices[0].message.content.clone().unwrap()
             }))
         }
         "deepseekv4flash" => {
-            Ok(Json(AIResponse {
-                output: req.user_prompt.clone(),
+            let request = ChatCompletionBuilder::new("deepseek/deepseek-v4-flash")
+                .user_message(req.user_prompt.clone().unwrap())
+                .temperature(req.temperature.unwrap_or(0.7))
+                .max_tokens(req.max_tokens.unwrap_or(200.0) as u32)
+                .top_p(req.top_p.unwrap_or(0.95))
+                //todo freq penalty
+                .system_message(req.system_prompt.clone().unwrap_or("".to_string()))
+                .build();
+            let response = client.chat_completion(request).await.unwrap();
+
+            Ok(Json(AIResponse{
+                output:response.choices[0].message.content.clone().unwrap()
             }))
         }
         "groq" => {
-            Ok(Json(AIResponse {
-                output: req.user_prompt.clone(),
+            let api_key = std::env::var("GROQ_API_KEY").unwrap();
+            let client = reqwest::Client::new();
+
+            let response = client
+                .post("https://api.groq.com/openai/v1")
+                .header("Authorization", format!("Bearer {}", api_key))
+                .json(&json!({
+                    "model": "gpt-4o",
+                    "messages": [{"role": "system", "content": req.system_prompt.clone().unwrap()},{"role": "user", "content": req.user_prompt.clone().unwrap()}],
+                }))
+                .send()
+                .await.unwrap()
+                .json::<serde_json::Value>()
+                .await.unwrap();
+            println!("{}", response["choices"][0]["message"]["content"]);
+            let out = response["choices"][0]["message"]["content"].as_str().unwrap().to_string();
+            Ok(Json(AIResponse{
+                output:out
             }))
         }
+
         _ => Err("missing provider".to_string()),
     }
 }
