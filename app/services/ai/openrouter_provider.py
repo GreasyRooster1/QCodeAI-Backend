@@ -23,7 +23,7 @@ class OpenRouterProvider(BaseAIProvider):
         with OpenRouter(
                 api_key=os.getenv("OPENROUTER_API_KEY", ""),
         ) as open_router:
-            res = open_router.chat.send(
+            res = await open_router.chat.send_async(
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
@@ -35,7 +35,7 @@ class OpenRouterProvider(BaseAIProvider):
                 top_p=top_p,
                 frequency_penalty=frequency_penalty,
                 reasoning_effort=self.reasoning_effort,
-            )
+            )m
         print(res)
         output = res.choices[0].message.content
         latency = (time.time() - start) * 1000
