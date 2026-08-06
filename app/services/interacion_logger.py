@@ -19,5 +19,5 @@ from firebase_admin import db as firebase_db
 #             user_token_counter.set(firebase_db.ServerValue.increment(tokens_spent))
 
 class InteractionLogger:
-    async def log(self, user_id: str, prompt: str, response: str, metadata: dict):
+    def log(self, user_id: str, prompt: str, response: str, metadata: dict):
         print(f"[AUTH OK] User: {user_id} | Tokens: {metadata.get('token_count')}")

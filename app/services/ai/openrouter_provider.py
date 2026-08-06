@@ -3,7 +3,6 @@ import time
 
 from openrouter import OpenRouter
 from openai import AsyncOpenAI
-from pygments.styles.dracula import yellow
 
 from app.services.ai.base_provider import BaseAIProvider
 from app.models.ai_result import AIResult
@@ -35,7 +34,7 @@ class OpenRouterProvider(BaseAIProvider):
                 top_p=top_p,
                 frequency_penalty=frequency_penalty,
                 reasoning_effort=self.reasoning_effort,
-            )m
+            )
         print(res)
         output = res.choices[0].message.content
         latency = (time.time() - start) * 1000

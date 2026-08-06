@@ -1,6 +1,8 @@
 import json
 import time
 import uuid
+
+import anyio
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from app.models.ai_request import AIRequest
@@ -14,8 +16,8 @@ logger = InteractionLogger()
 @router.post("/generate")
 async def generate(request: AIRequest, user: dict = Depends(verify_student)):
     provider = ProviderFactory.create(request.provider)
-    
-    result = await provider.generate(
+    async def blocking():
+        return await provider.generate(
         system_prompt=request.system_prompt,
         user_prompt=request.user_prompt,
         temperature=request.temperature,
@@ -23,9 +25,10 @@ async def generate(request: AIRequest, user: dict = Depends(verify_student)):
         frequency_penalty=request.frequency_penalty,
         max_tokens=request.max_tokens
     )
-    
-    await logger.log(
-        user_id="crashtestdummy",
+    result = await anyio.to_thread.run_sync(blocking)
+    print(user)
+    logger.log(
+        user_id="",
         prompt=request.user_prompt,
         response=result.output,
         metadata={
