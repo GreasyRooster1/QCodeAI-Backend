@@ -7,3 +7,5 @@ edition = "2024"
 rocket_firebase_auth = "0.5"
 rocket = { version = "0.5.1",features = ["json","serde_json"] }
 serde = "1.0.229"
+openrouter-rust = "0.1.0"
+dotenvy = "0.15"

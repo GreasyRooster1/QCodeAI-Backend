@@ -1,6 +1,8 @@
 #[macro_use] extern crate rocket;
 
+use std::env;
 use std::sync::Arc;
+use openrouter_rust::OpenRouterClient;
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::{Request, Response};
 use rocket::http::Header;
@@ -51,10 +53,27 @@ fn status() -> &'static str {
 
 #[post("/ai/generate",format = "json", data = "<req>")]
 fn generate(token: FirebaseToken,req: Json<AIRequest>) -> Result<Json<AIResponse>, String> {
-
-    Ok(Json(AIResponse {
-        output: "success".to_string(),
-    }))
+    let client = OpenRouterClient::builder()
+        .api_key(env::var("OPENROUTER_API_KEY"))
+        .build()?;
+    match req.provider.as_str() {
+        "kimi27code" => {
+            Ok(Json(AIResponse {
+                output: req.user_prompt.clone(),
+            }))
+        }
+        "deepseekv4flash" => {
+            Ok(Json(AIResponse {
+                output: req.user_prompt.clone(),
+            }))
+        }
+        "groq" => {
+            Ok(Json(AIResponse {
+                output: req.user_prompt.clone(),
+            }))
+        }
+        _ => Err("missing provider".to_string()),
+    }
 }
 
 pub struct CORS;
