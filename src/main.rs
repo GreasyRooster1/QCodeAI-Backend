@@ -1,12 +1,15 @@
 #[macro_use] extern crate rocket;
 
 use std::sync::Arc;
+use rocket::serde::json::Json;
+use rocket::serde::{Deserialize, Serialize};
 use rocket_firebase_auth::{FirebaseAuth, FirebaseToken};
 
 struct ServerState {
     auth: FirebaseAuth,
 }
 
+#[derive(Serialize,Deserialize)]
 struct AIResponse{
     output:String,
 }
@@ -22,7 +25,7 @@ async fn rocket() -> _ {
     rocket::build()
     .mount("/",routes![status])
     .mount("/api", routes![
-        status
+        generate
     ]).manage(ServerState { auth: firebase_auth })
 }
 
@@ -32,6 +35,8 @@ fn status() -> &'static str {
 }
 
 #[post("/ai/generate")]
-fn generate(token: FirebaseToken) -> &'static str {
-    "running"
+fn generate(token: FirebaseToken) -> Result<Json<AIResponse>, String> {
+    Ok(Json(AIResponse {
+        output: "success".to_string(),
+    }))
 }
