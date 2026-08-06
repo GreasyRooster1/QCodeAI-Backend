@@ -7,6 +7,10 @@ struct ServerState {
     auth: FirebaseAuth,
 }
 
+struct AIResponse{
+    output:String,
+}
+
 #[launch]
 async fn rocket() -> _ {
 
@@ -15,9 +19,11 @@ async fn rocket() -> _ {
         .build()
         .unwrap();
 
-    rocket::build().mount("/", routes![
+    rocket::build()
+    .mount("/",routes![status])
+    .mount("/api", routes![
         status
-    ])
+    ]).manage(ServerState { auth: firebase_auth })
 }
 
 #[get("/")]
@@ -25,7 +31,7 @@ fn status() -> &'static str {
     "running"
 }
 
-#[post("/api/ai/generate")]
-fn generate() -> &'static str {
+#[post("/ai/generate")]
+fn generate(token: FirebaseToken) -> &'static str {
     "running"
 }
