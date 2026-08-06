@@ -16,6 +16,16 @@ struct ServerState {
 struct AIResponse{
     output:String,
 }
+#[derive(Serialize,Deserialize)]
+struct AIRequest {
+    provider: String,
+    system_prompt: String,
+    user_prompt: String,
+    temperature: f32,
+    top_p: f32,
+    frequency_penalty: f32,
+    max_tokens: f32,
+}
 
 #[launch]
 async fn rocket() -> _ {
@@ -29,7 +39,9 @@ async fn rocket() -> _ {
     .mount("/",routes![status,all_options])
     .mount("/api", routes![
         generate
-    ]).manage(ServerState { auth: firebase_auth })
+    ])
+    .manage(firebase_auth)
+    .attach(CORS)
 }
 
 #[get("/")]
@@ -37,8 +49,9 @@ fn status() -> &'static str {
     "running"
 }
 
-#[post("/ai/generate")]
-fn generate(token: FirebaseToken) -> Result<Json<AIResponse>, String> {
+#[post("/ai/generate",format = "json", data = "<req>")]
+fn generate(token: FirebaseToken,req: Json<AIRequest>) -> Result<Json<AIResponse>, String> {
+
     Ok(Json(AIResponse {
         output: "success".to_string(),
     }))
@@ -56,7 +69,7 @@ impl Fairing for CORS {
     }
 
     async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
-        response.set_header(Header::new("Access-Control-Allow-Origin", "http://localhost:3000, ai.esporterz.com"));
+        response.set_header(Header::new("Access-Control-Allow-Origin", "http://localhost:3000"));
         response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, DELETE, OPTIONS"));
         response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
         response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
