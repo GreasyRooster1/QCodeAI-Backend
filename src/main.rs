@@ -89,7 +89,7 @@ async fn generate(token: FirebaseToken,req: Json<AIRequest>) -> Result<Json<AIRe
                 .system_message(req.system_prompt.clone().unwrap_or("".to_string()))
                 .build();
             let response = client.chat_completion(request).await.unwrap();
-
+            print!("{:?}",response);
             Ok(Json(AIResponse{
                 output:response.choices[0].message.content.clone().unwrap()
             }))
@@ -103,6 +103,10 @@ async fn generate(token: FirebaseToken,req: Json<AIRequest>) -> Result<Json<AIRe
                 .header("Authorization", format!("Bearer {}", api_key))
                 .json(&json!({
                     "model": "llama-3.1-8b-instant",
+                    "temperature": req.temperature.unwrap_or(0.7),
+                    "top_p": req.top_p.unwrap_or(0.95),
+                    "max_output_tokens": req.max_tokens.unwrap_or(200.0) as u32,
+                    "frequency_penalty": req.frequency_penalty.unwrap_or(0.0),
                     "messages": [{"role": "system", "content": req.system_prompt.clone().unwrap()},{"role": "user", "content": req.user_prompt.clone().unwrap()}],
                 }))
                 .send()
@@ -132,7 +136,7 @@ impl Fairing for CORS {
     }
 
     async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
-        response.set_header(Header::new("Access-Control-Allow-Origin", "https://ai.esporterz.com"));
+        response.set_header(Header::new("Access-Control-Allow-Origin", "http://localhost:3000")); //https://ai.esporterz.com
         response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, DELETE, OPTIONS"));
         response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
         response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
