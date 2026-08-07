@@ -105,7 +105,7 @@ async fn generate(token: FirebaseToken,req: Json<AIRequest>) -> Result<Json<AIRe
                     "model": "llama-3.1-8b-instant",
                     "temperature": req.temperature.unwrap_or(0.7),
                     "top_p": req.top_p.unwrap_or(0.95),
-                    "max_output_tokens": req.max_tokens.unwrap_or(200.0) as u32,
+                    "max_tokens": req.max_tokens.unwrap_or(200.0) as u32,
                     "frequency_penalty": req.frequency_penalty.unwrap_or(0.0),
                     "messages": [{"role": "system", "content": req.system_prompt.clone().unwrap()},{"role": "user", "content": req.user_prompt.clone().unwrap()}],
                 }))
