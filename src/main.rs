@@ -136,7 +136,7 @@ impl Fairing for CORS {
     }
 
     async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
-        response.set_header(Header::new("Access-Control-Allow-Origin", "http://localhost:3000")); //https://ai.esporterz.com
+        response.set_header(Header::new("Access-Control-Allow-Origin", "https://ai.esporterz.com")); //https://ai.esporterz.com
         response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, DELETE, OPTIONS"));
         response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
         response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
